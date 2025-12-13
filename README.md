@@ -1,6 +1,6 @@
 ## Description
 
-A basic RESTP API project with JWT authentication and using JWT authentication
+A basic RESTP API project with JWT authentication and TypeORM
 
 ## Project setup
 
