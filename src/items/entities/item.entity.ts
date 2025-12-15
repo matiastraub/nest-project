@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { Listing } from './listing.entity';
+import { Comment } from './comment.entity';
 @Entity()
 export class Item {
   @PrimaryGeneratedColumn()
@@ -20,6 +22,9 @@ export class Item {
   @OneToOne(() => Listing, { cascade: true })
   @JoinColumn()
   listing: Listing;
+
+  @OneToMany(() => Comment, (comment) => comment.item, { cascade: true })
+  comments: Comment[];
 
   constructor(item: Partial<Item>) {
     Object.assign(this, item);

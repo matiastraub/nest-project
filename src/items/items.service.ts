@@ -5,6 +5,8 @@ import { EntityManager, Repository } from 'typeorm';
 import { Item } from './entities/item.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Listing } from './entities/listing.entity';
+import { Comment } from './entities/comment.entity';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class ItemsService {
@@ -15,7 +17,7 @@ export class ItemsService {
 
   async create(createItemDto: CreateItemDto) {
     const listing = new Listing({ ...createItemDto.listing, rating: 0 });
-    const item = new Item({ ...createItemDto, listing });
+    const item = new Item({ ...createItemDto, comments: [], listing });
     await this.entityManager.save(item);
   }
 
@@ -26,16 +28,27 @@ export class ItemsService {
   async findOne(id: number) {
     return this.itemsRepository.findOne({
       where: { id },
-      relations: { listing: true },
+      relations: { listing: true, comments: true },
     });
   }
 
   async update(id: number, updateItemDto: UpdateItemDto) {
     const item = await this.itemsRepository.findOneBy({ id });
-    if (item?.public) {
+    if (!item) {
+      throw new NotFoundError('Item not found');
+    }
+    if (updateItemDto.public !== undefined) {
       item.public = updateItemDto.public;
     }
 
+    if (updateItemDto.comments) {
+      item.comments = updateItemDto.comments.map((dto) =>
+        this.entityManager.create(Comment, {
+          content: dto.content,
+          item,
+        }),
+      );
+    }
     await this.entityManager.save(item);
   }
 
