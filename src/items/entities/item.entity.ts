@@ -1,5 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
+import { Listing } from './listing.entity';
 @Entity()
 export class Item {
   @PrimaryGeneratedColumn()
@@ -11,9 +17,11 @@ export class Item {
   @Column({ default: true })
   public: boolean;
 
+  @OneToOne(() => Listing, { cascade: true })
+  @JoinColumn()
+  listing: Listing;
+
   constructor(item: Partial<Item>) {
-    if (item) {
-      Object.assign(this, item);
-    }
+    Object.assign(this, item);
   }
 }

@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsBoolean,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateListingDto } from './create-listing.dto';
 
 export class CreateItemDto {
   @IsString()
@@ -7,4 +15,8 @@ export class CreateItemDto {
   @IsBoolean()
   @IsOptional()
   public?: boolean;
+
+  @ValidateNested()
+  @Type(() => CreateListingDto)
+  listing: CreateListingDto;
 }
