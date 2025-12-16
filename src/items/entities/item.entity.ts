@@ -5,9 +5,12 @@ import {
   JoinColumn,
   OneToOne,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Listing } from './listing.entity';
 import { Comment } from './comment.entity';
+import { Tag } from './tag.entity';
 @Entity()
 export class Item {
   @PrimaryGeneratedColumn()
@@ -26,7 +29,7 @@ export class Item {
   @OneToMany(() => Comment, (comment) => comment.item, { cascade: true })
   comments: Comment[];
 
-  constructor(item: Partial<Item>) {
-    Object.assign(this, item);
-  }
+  @ManyToMany(() => Tag, { cascade: true })
+  @JoinTable()
+  tags: Tag[];
 }
