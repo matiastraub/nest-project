@@ -17,7 +17,6 @@ export class ItemsController {
 
   @Post()
   async create(@Body() createItemDto: CreateItemDto) {
-    console.log('controller: ', createItemDto);
     return this.itemsService.create(createItemDto);
   }
 
