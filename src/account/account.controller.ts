@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { AccountQueryDto } from './dto/account-query-dto';
 
-@Controller('account')
+@Controller('accounts')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
@@ -22,8 +24,8 @@ export class AccountController {
   }
 
   @Get()
-  findAll() {
-    return this.accountService.findAll();
+  findAll(@Query() query: AccountQueryDto) {
+    return this.accountService.findAll(query);
   }
 
   @Get(':id')
@@ -40,7 +42,7 @@ export class AccountController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.accountService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.accountService.remove(id);
   }
 }

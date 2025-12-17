@@ -1,26 +1,51 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { Account } from './entities/account.entity';
+import { EntityManager, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult } from 'typeorm/browser';
+import { AccountQueryDto } from './dto/account-query-dto';
 
 @Injectable()
 export class AccountService {
-  create(createAccountDto: CreateAccountDto) {
-    return 'This action adds a new account';
+  constructor(
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
+    private readonly entityManager: EntityManager,
+  ) {}
+
+  async create(createAccountDto: CreateAccountDto) {
+    const account = this.entityManager.create(Account, {
+      number: createAccountDto.number,
+      type: createAccountDto.type,
+    });
+    return this.entityManager.save(account);
   }
 
-  findAll() {
-    return `This action returns all account`;
+  async findAll(query: AccountQueryDto) {
+    const qb = this.accountRepository.createQueryBuilder('account');
+    if (query.type) {
+      qb.andWhere('account.type = :type', { type: query.type });
+    }
+    return qb.getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} account`;
+  async findOne(id: number) {
+    return this.accountRepository.findOneBy({ id });
   }
 
-  update(id: number, updateAccountDto: UpdateAccountDto) {
-    return `This action updates a #${id} account`;
+  async update(
+    id: number,
+    updateAccountDto: UpdateAccountDto,
+  ): Promise<Account | undefined> {
+    const account = await this.accountRepository.findOneBy({ id });
+    if (account) {
+      return this.accountRepository.save({ id, ...updateAccountDto });
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} account`;
+  remove(id: number): Promise<DeleteResult | undefined> {
+    return this.accountRepository.delete(id);
   }
 }

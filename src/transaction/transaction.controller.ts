@@ -6,23 +6,31 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { TransactionQueryDto } from './dto/transaction-query.dto';
 
-@Controller('transaction')
+@Controller('accounts/:accountId/transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionService.create(createTransactionDto);
+  create(
+    @Param('accountId') accountId: number,
+    @Body() createTransactionDto: CreateTransactionDto,
+  ) {
+    return this.transactionService.create(accountId, createTransactionDto);
   }
 
   @Get()
-  findAll() {
-    return this.transactionService.findAll();
+  findAll(
+    @Param('accountId') accountId: number,
+    @Query() query: TransactionQueryDto,
+  ) {
+    return this.transactionService.findAll(accountId, query);
   }
 
   @Get(':id')
